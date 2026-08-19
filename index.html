@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora Pro - Electrónica</title>
+<!-- Favicon SVG con forma de Resistencia -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230f172a'/><line x1='2' y1='16' x2='9' y2='16' stroke='%2394a3b8' stroke-width='3'/><line x1='23' y1='16' x2='30' y2='16' stroke='%2394a3b8' stroke-width='3'/><rect x='9' y='10' width='14' height='12' rx='2' fill='%23fde68a' stroke='%23b45309' stroke-width='1.5'/><rect x='11' y='10' width='2' height='12' fill='%237c2d12'/><rect x='15' y='10' width='2' height='12' fill='%23dc2626'/><rect x='19' y='10' width='2' height='12' fill='%2316a34a'/></svg>">
+<style>
+:root {
+    --bg-color: #f1f5f9;
+    --card-bg: #ffffff;
+    --card-border: #cbd5e1;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --accent-cyan: #0284c7;
+    --accent-pink: #db2777;
+    --accent-green: #059669;
+    --accent-glow: rgba(2, 132, 199, 0.15);
+    --input-bg: #f8fafc;
+}
+* { box-sizing: border-box; }
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    justify-content: center;
+}
+.main-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr 300px;
+    gap: 20px;
+    max-width: 1250px;
+    width: 100%;
+    align-items: start;
+}
+@media (max-width: 1050px) {
+    .main-layout { grid-template-columns: 1fr; }
+}
+.side-panel {
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 20px;
+    height: 680px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+}
+.side-title {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--accent-cyan);
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+.ai-chat-container {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    gap: 10px;
+    overflow: hidden;
+}
+.ai-chat-messages {
+    background-color: var(--input-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 10px;
+    flex-grow: 1;
+    overflow-y: auto;
+    font-size: 0.78rem;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.ai-msg {
+    padding: 8px 10px;
+    border-radius: 8px;
+    line-height: 1.3;
+    word-break: break-word;
+}
+.ai-msg.user {
+    background-color: rgba(2, 132, 199, 0.1);
+    color: #0369a1;
+    align-self: flex-end;
+    border: 1px solid rgba(2, 132, 199, 0.25);
+    font-weight: 500;
+}
+.ai-msg.bot {
+    background-color: #ffffff;
+    color: var(--text-muted);
+    align-self: flex-start;
+    border: 1px solid var(--card-border);
+}
+.ai-input-group {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+.ai-input {
+    flex-grow: 1;
+    padding: 8px;
+    border-radius: 8px;
+    background-color: var(--input-bg);
+    border: 1px solid var(--card-border);
+    color: var(--text-main);
+    font-size: 0.78rem;
+    outline: none;
+}
+.ai-input:focus { border-color: var(--accent-cyan); }
+.curiosity-card {
+    background: linear-gradient(135deg, rgba(5, 150, 105, 0.06), rgba(255, 255, 255, 0.8));
+    border: 1px solid rgba(5, 150, 105, 0.25);
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.curiosity-text {
+    font-size: 0.8rem;
+    color: #065f46;
+    line-height: 1.4;
+    margin: 0;
+    min-height: 75px;
+    font-weight: 500;
+}
+.curiosity-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+/* Estilos para espacios de anuncios profesionales */
+.ad-container {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    padding: 10px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-height: 90px;
+    position: relative;
+    overflow: hidden;
+}
+.ad-container::before {
+    content: "ADVERTISEMENT";
+    position: absolute;
+    top: 2px;
+    right: 6px;
+    font-size: 0.5rem;
+    color: #94a3b8;
+    letter-spacing: 0.05em;
+}
+.container {
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    padding: 24px;
+    border-radius: 16px;
+    width: 100%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+    height: 680px;
+    display: flex;
+    flex-direction: column;
+}
+.nav-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    background-color: var(--input-bg);
+    padding: 6px;
+    border-radius: 12px;
+    border: 1px solid var(--card-border);
+    margin-bottom: 15px;
+    flex-shrink: 0;
+}
+.tab-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    padding: 8px 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+.tab-btn.active {
+    background: linear-gradient(135deg, #0284c7, #2563eb);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+}
+.tab-content {
+    display: none;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+.tab-content.active {
+    display: flex;
+    flex-direction: column;
+}
+.circuit-canvas-box {
+    background: linear-gradient(145deg, #f8fafc, #e2e8f0);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 8px;
+    margin-bottom: 10px;
+    text-align: center;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.03);
+    flex-shrink: 0;
+    height: 125px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+#svgCircuitoContainer, #svgOhmContainer {
+    width: 100%;
+    height: 95px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.resistor-preview {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 12px;
+    background: linear-gradient(145deg, #f8fafc, #e2e8f0);
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid var(--card-border);
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.03);
+    flex-shrink: 0;
+}
+.resistor-svg {
+    width: 230px;
+    height: 70px;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+}
+.selectors-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-shrink: 0;
+}
+.band-group.full-width { grid-column: span 2; }
+label {
+    display: block;
+    font-size: 0.72rem;
+    margin-bottom: 2px;
+    color: var(--text-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+}
+select, input[type="text"], input[type="number"] {
+    width: 100%;
+    padding: 7px 10px;
+    border-radius: 8px;
+    background-color: var(--input-bg);
+    color: var(--text-main);
+    border: 1px solid var(--card-border);
+    font-size: 0.8rem;
+    font-weight: 500;
+    outline: none;
+    transition: all 0.2s ease;
+}
+select { cursor: pointer; }
+select:hover, input:hover { border-color: var(--accent-cyan); }
+select:focus, input:focus {
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+    background-color: #ffffff;
+}
+#dynamicResistorsContainer {
+    background: var(--input-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 8px;
+    max-height: 130px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+.resistor-row-item {
+    display: grid;
+    grid-template-columns: 70px 1fr 85px 30px;
+    gap: 6px;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid var(--card-border);
+    padding: 5px 8px;
+    border-radius: 8px;
+}
+.resistor-row-item .r-label {
+    font-weight: 700;
+    color: var(--accent-cyan);
+    font-size: 0.78rem;
+}
+.mixto-section-box {
+    background: var(--input-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 8px;
+    max-height: 130px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+.result-box {
+    margin-top: auto;
+    padding: 10px;
+    background: linear-gradient(135deg, rgba(2, 132, 199, 0.08), rgba(241, 245, 249, 1));
+    border-radius: 10px;
+    text-align: center;
+    border: 1px solid rgba(2, 132, 199, 0.3);
+    flex-shrink: 0;
+}
+.result-box label {
+    color: var(--accent-cyan);
+    font-size: 0.7rem;
+    font-weight: 800;
+    margin-bottom: 2px;
+}
+.result-value {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #0369a1;
+    margin-bottom: 3px;
+}
+.voice-controls {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+}
+.btn-vibrant {
+    background: linear-gradient(135deg, #0284c7, #2563eb);
+    color: #ffffff;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(2, 132, 199, 0.25);
+    transition: opacity 0.2s;
+}
+.btn-vibrant:hover { opacity: 0.9; }
+.btn-green {
+    background: linear-gradient(135deg, #059669, #047857);
+    box-shadow: 0 4px 10px rgba(5, 150, 105, 0.25);
+}
+.btn-pink {
+    background: linear-gradient(135deg, #db2777, #be185d);
+    box-shadow: 0 4px 10px rgba(219, 39, 119, 0.25);
+}
+.btn-danger {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    padding: 3px 6px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.7rem;
+    font-weight: bold;
+}
+.btn-danger:hover { background: rgba(239, 68, 68, 0.2); }
+.voice-select { width: 105px; padding: 4px; font-size: 0.7rem; background: #ffffff; }
+</style>
+</head>
+<body>
+<div class="main-layout">
+    <!-- Panel Izquierdo: IA -->
+    <aside class="side-panel">
+        <span class="side-title" id="txtAiTitle">⚡ IA de Electrónica</span>
+        <div class="ai-chat-container">
+            <div class="ai-chat-messages" id="aiChatMessages">
+                <div class="ai-msg bot" id="aiWelcomeMsg">¡Hola! Pregúntame sobre circuitos, ley de Ohm o bandas.</div>
+            </div>
+            <div class="ai-input-group">
+                <input type="text" id="aiInputUser" class="ai-input" placeholder="Pregunta..." onkeypress="if(event.key === 'Enter') consultarIA()">
+                <button class="btn-vibrant" id="btnSendAi" style="padding: 6px 10px; font-size: 0.72rem;" onclick="consultarIA()">Enviar</button>
+            </div>
+        </div>
+        <!-- Espacio de Anuncio Lateral Izquierdo -->
+        <div class="ad-container" id="adBannerLeft" style="margin-top: 10px;">
+            <span>📢 Espacio Publicitario</span>
+            <span style="font-size: 0.6rem; font-weight: normal; color: #64748b;">(Banner 250x90 px)</span>
+        </div>
+        <div style="font-size: 0.65rem; color: var(--text-muted); text-align: center; margin-top: 6px; font-weight: 600;" id="aiActiveLabel">Asistente Activo</div>
+    </aside>
+
+    <!-- Contenedor Central -->
+    <div class="container">
+        <div class="nav-tabs">
+            <button class="tab-btn active" id="btnTabBandas" onclick="cambiarPestaña('bandas')">Bandas</button>
+            <button class="tab-btn" id="btnTabSuma" onclick="cambiarPestaña('suma')">Sumar Resist.</button>
+            <button class="tab-btn" id="btnTabOhm" onclick="cambiarPestaña('ohm')">Ley de Ohm</button>
+        </div>
+
+        <!-- VISTA 1: CALCULADORA DE BANDAS -->
+        <div class="tab-content active" id="contentBandas">
+            <div class="resistor-preview">
+                <svg class="resistor-svg" viewBox="0 0 320 110">
+                    <defs>
+                        <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#fef3c7" />
+                            <stop offset="30%" stop-color="#fde68a" />
+                            <stop offset="50%" stop-color="#fffbeb" />
+                            <stop offset="75%" stop-color="#fcd34d" />
+                            <stop offset="100%" stop-color="#d97706" />
+                        </linearGradient>
+                        <linearGradient id="metalGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#94a3b8" />
+                            <stop offset="50%" stop-color="#e2e8f0" />
+                            <stop offset="100%" stop-color="#64748b" />
+                        </linearGradient>
+                    </defs>
+                    <line x1="10" y1="55" x2="70" y2="55" stroke="url(#metalGrad)" stroke-width="4.5" stroke-linecap="round"/>
+                    <line x1="250" y1="55" x2="310" y2="55" stroke="url(#metalGrad)" stroke-width="4.5" stroke-linecap="round"/>
+                    <rect x="68" y="32" width="10" height="46" rx="2" fill="url(#metalGrad)" stroke="#475569" stroke-width="1"/>
+                    <rect x="242" y="32" width="10" height="46" rx="2" fill="url(#metalGrad)" stroke="#475569" stroke-width="1"/>
+                    <path d="M 75,25 Q 85,10 105,25 L 215,25 Q 235,10 245,25 L 245,85 Q 235,100 215,85 L 105,85 Q 85,100 75,85 Z" fill="url(#bodyGrad)" stroke="#b45309" stroke-width="2"/>
+                    <rect id="svgB1" x="115" y="23" width="10" height="64" fill="var(--c-band1)" rx="2"/>
+                    <rect id="svgB2" x="140" y="22" width="10" height="66" fill="var(--c-band2)" rx="2"/>
+                    <rect id="svgB3" x="165" y="22" width="10" height="66" fill="var(--c-band3)" rx="2" style="display:none;"/>
+                    <rect id="svgMult" x="190" y="22" width="10" height="64" fill="var(--c-mult)" rx="2"/>
+                    <rect id="svgTol" x="220" y="23" width="8" height="65" fill="var(--c-tol)" rx="2"/>
+                    <rect id="svgTemp" x="128" y="22.5" width="6" height="65" fill="var(--c-temp)" rx="1.5" style="display:none;"/>
+                </svg>
+            </div>
+            
+            <div class="selectors-grid">
+                <div class="band-group full-width">
+                    <label id="lblTipoRes" for="tipoBandas">Tipo de Resistencia</label>
+                    <select id="tipoBandas" onchange="actualizarInterfazBandas(); calcularResistencia();">
+                        <option value="4">4 Bandas</option>
+                        <option value="5" selected>5 Bandas (Alta Precisión)</option>
+                        <option value="6">6 Bandas (Con Coeficiente Térmico)</option>
+                    </select>
+                </div>
+                <div class="band-group">
+                    <label id="lblBand1" for="band1">Banda 1</label>
+                    <select id="band1" onchange="calcularResistencia()">
+                        <option value="0" data-color="#0f172a">Negro (0)</option>
+                        <option value="1" data-color="#7c2d12" selected>Marrón (1)</option>
+                        <option value="2" data-color="#dc2626">Rojo (2)</option>
+                        <option value="3" data-color="#ea580c">Naranja (3)</option>
+                        <option value="4" data-color="#ca8a04">Amarillo (4)</option>
+                        <option value="5" data-color="#16a34a">Verde (5)</option>
+                        <option value="6" data-color="#2563eb">Azul (6)</option>
+                        <option value="7" data-color="#9333ea">Violeta (7)</option>
+                        <option value="8" data-color="#475569">Gris (8)</option>
+                        <option value="9" data-color="#0f172a">Blanco (9)</option>
+                    </select>
+                </div>
+                <div class="band-group">
+                    <label id="lblBand2" for="band2">Banda 2</label>
+                    <select id="band2" onchange="calcularResistencia()">
+                        <option value="0" data-color="#0f172a">Negro (0)</option>
+                        <option value="1" data-color="#7c2d12">Marrón (1)</option>
+                        <option value="2" data-color="#dc2626" selected>Rojo (2)</option>
+                        <option value="3" data-color="#ea580c">Naranja (3)</option>
+                        <option value="4" data-color="#ca8a04">Amarillo (4)</option>
+                        <option value="5" data-color="#16a34a">Verde (5)</option>
+                        <option value="6" data-color="#2563eb">Azul (6)</option>
+                        <option value="7" data-color="#9333ea">Violeta (7)</option>
+                        <option value="8" data-color="#475569">Gris (8)</option>
+                        <option value="9" data-color="#0f172a">Blanco (9)</option>
+                    </select>
+                </div>
+                <div class="band-group" id="grupoBanda3">
+                    <label id="lblBand3" for="band3">Banda 3 (Cifra)</label>
+                    <select id="band3" onchange="calcularResistencia()">
+                        <option value="0" data-color="#0f172a" selected>Negro (0)</option>
+                        <option value="1" data-color="#7c2d12">Marrón (1)</option>
+                        <option value="2" data-color="#dc2626">Rojo (2)</option>
+                        <option value="3" data-color="#ea580c">Naranja (3)</option>
+                        <option value="4" data-color="#ca8a04">Amarillo (4)</option>
+                        <option value="5" data-color="#16a34a">Verde (5)</option>
+                        <option value="6" data-color="#2563eb">Azul (6)</option>
+                        <option value="7" data-color="#9333ea">Violeta (7)</option>
+                        <option value="8" data-color="#475569">Gris (8)</option>
+                        <option value="9" data-color="#0f172a">Blanco (9)</option>
+                    </select>
+                </div>
+                <div class="band-group">
+                    <label id="lblMult" for="multiplier">Multiplicador</label>
+                    <select id="multiplier" onchange="calcularResistencia()">
+                        <option value="1" data-color="#0f172a">Negro (x1 Ω)</option>
+                        <option value="10" data-color="#7c2d12">Marrón (x10 Ω)</option>
+                        <option value="100" data-color="#dc2626" selected>Rojo (x100 Ω)</option>
+                        <option value="1000" data-color="#ea580c">Naranja (x1 kΩ)</option>
+                        <option value="10000" data-color="#ca8a04">Amarillo (x10 kΩ)</option>
+                        <option value="100000" data-color="#16a34a">Verde (x100 kΩ)</option>
+                        <option value="1000000" data-color="#2563eb">Azul (x1 MΩ)</option>
+                        <option value="10000000" data-color="#9333ea">Violeta (x10 MΩ)</option>
+                    </select>
+                </div>
+                <div class="band-group">
+                    <label id="lblTol" for="tolerance">Tolerancia</label>
+                    <select id="tolerance" onchange="calcularResistencia()">
+                        <option value="±1%" data-color="#7c2d12" selected>Marrón (±1%)</option>
+                        <option value="±2%" data-color="#dc2626">Rojo (±2%)</option>
+                        <option value="±0.5%" data-color="#16a34a">Verde (±0.5%)</option>
+                        <option value="±5%" data-color="#ca8a04">Dorado (±5%)</option>
+                    </select>
+                </div>
+                <div class="band-group" id="grupoBanda6" style="display: none;">
+                    <label id="lblTemp" for="tempCoeff">Coef. Térmico</label>
+                    <select id="tempCoeff" onchange="calcularResistencia()">
+                        <option value="100 ppm/°C" data-color="#7c2d12">Marrón (100 ppm)</option>
+                        <option value="50 ppm/°C" data-color="#dc2626">Rojo (50 ppm)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="result-box">
+                <label id="lblValorCalculado">Valor Calculado</label>
+                <div class="result-value" id="resultado">2.00 kΩ</div>
+                <div class="voice-controls">
+                    <button class="btn-vibrant" id="btnEscuchar" onclick="hablarResultado()">🔊 Escuchar</button>
+                    <select id="idiomaVoz" class="voice-select" onchange="cambiarIdiomaInterfaz()">
+                        <option value="es-ES" selected>Español</option>
+                        <option value="en-US">English</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- VISTA 2: SUMAR RESISTENCIAS -->
+        <div class="tab-content" id="contentSuma">
+            <div class="selectors-grid">
+                <div>
+                    <label id="lblTipoConexion">Tipo de Conexión</label>
+                    <select id="tipoConexion" onchange="actualizarModoConexionSumador(); calcularSerieParalelo();">
+                        <option value="serie">En Serie</option>
+                        <option value="paralelo">En Paralelo</option>
+                        <option value="mixto">Mixto (Serie / Paralelo)</option>
+                    </select>
+                </div>
+                <div id="btnAgregarContenedor" style="display: flex; align-items: flex-end;">
+                    <button class="btn-vibrant btn-green" id="btnAgregarResist" style="width: 100%; padding: 7px;" onclick="agregarResistenciaIndividual()">+ Agregar</button>
+                </div>
+            </div>
+
+            <div id="dynamicResistorsContainer" style="display: flex;"></div>
+            <div id="mixtoAdvancedContainer" class="mixto-section-box" style="display: none;"></div>
+
+            <div class="circuit-canvas-box">
+                <label id="lblEsquemaGrafico" style="margin-bottom: 2px;">Esquema Gráfico del Circuito (Con Valores)</label>
+                <div id="svgCircuitoContainer">
+                    <svg id="svgEsquema" viewBox="0 0 380 110" style="width: 100%; height: 100%;">
+                        <text x="190" y="55" fill="#64748b" font-size="11" text-anchor="middle">Ingresa valores para ver el diagrama</text>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="result-box">
+                <label id="lblResEq">Resistencia Equivalente Total (Rt)</label>
+                <div class="result-value" id="resultadoGrupo">0 Ω</div>
+            </div>
+        </div>
+
+        <!-- VISTA 3: LEY DE OHM -->
+        <div class="tab-content" id="contentOhm">
+            <div class="selectors-grid">
+                <div>
+                    <label id="lblOhmCalcular" for="ohmCalcular">¿Qué deseas calcular?</label>
+                    <select id="ohmCalcular" onchange="actualizarCamposOhm(); calcularLeyOhm();">
+                        <option value="V" selected>Voltaje (V = I × R)</option>
+                        <option value="I">Corriente (I = V / R)</option>
+                        <option value="R">Resistencia (R = V / I)</option>
+                    </select>
+                </div>
+                <div id="ohmCampo1Container">
+                    <label id="ohmLabel1" for="ohmVal1">Corriente (I)</label>
+                    <div style="display: flex; gap: 4px;">
+                        <input type="number" id="ohmVal1" value="0.5" oninput="calcularLeyOhm()">
+                        <select id="ohmUnit1" onchange="calcularLeyOhm()" style="width: 70px; background:#fff;">
+                            <option value="1" selected>A</option>
+                            <option value="0.001">mA</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="selectors-grid">
+                <div id="ohmCampo2Container">
+                    <label id="ohmLabel2" for="ohmVal2">Resistencia (R)</label>
+                    <div style="display: flex; gap: 4px;">
+                        <input type="number" id="ohmVal2" value="100" oninput="calcularLeyOhm()">
+                        <select id="ohmUnit2" onchange="calcularLeyOhm()" style="width: 70px; background:#fff;">
+                            <option value="1" selected>Ω</option>
+                            <option value="1000">kΩ</option>
+                        </select>
+                    </div>
+                </div>
+                <div></div>
+            </div>
+
+            <div class="circuit-canvas-box">
+                <label id="lblDiagramaOhm" style="margin-bottom: 2px;">Diagrama Circuital Ley de Ohm</label>
+                <div id="svgOhmContainer">
+                    <svg id="svgOhmEsquema" viewBox="0 0 380 110" style="width: 100%; height: 100%;">
+                        <text x="190" y="55" fill="#64748b" font-size="11" text-anchor="middle">Calculando circuito básico...</text>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="result-box">
+                <label id="ohmResultadoLabel">Voltaje Calculado (V)</label>
+                <div class="result-value" id="ohmResultadoValor">50.00 V</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel Derecho: Curiosidades y Anuncio -->
+    <aside class="side-panel">
+        <div class="side-title">
+            <span id="txtCuriosityTitle">💡 ¿Sabías que?</span>
+            <button id="btnMuteGeneral" class="btn-vibrant btn-pink" onclick="toggleMuteCuriosidades()" style="font-size: 0.65rem; padding: 3px 8px;">Sonido ON</button>
+        </div>
+        <div class="curiosity-card">
+            <p class="curiosity-text" id="curiosityText">Cargando...</p>
+            <div class="curiosity-controls">
+                <button class="btn-vibrant btn-green" id="btnNextCuriosity" onclick="siguienteCuriosidad()" style="font-size: 0.72rem; padding: 6px;">Siguiente</button>
+                <button class="btn-vibrant" id="btnMuteCuriosity" onclick="pararVozCuriosidad()" style="font-size: 0.72rem; padding: 6px;">Callar</button>
+            </div>
+        </div>
+        <!-- Espacio de Anuncio Lateral Derecho -->
+        <div class="ad-container" id="adBannerRight" style="flex-grow: 1; max-height: 220px;">
+            <span>💡 Espacio Patrocinado</span>
+            <span style="font-size: 0.6rem; font-weight: normal; color: #64748b;">(Ideal para Google AdSense o Banner 250x200)</span>
+        </div>
+    </aside>
+</div>
+
+<script>
+const traducciones = {
+    'es-ES': {
+        aiTitle: '⚡ IA de Electrónica',
+        aiWelcome: '¡Hola! Pregúntame sobre circuitos, ley de Ohm o bandas.',
+        aiPlaceholder: 'Pregunta...',
+        aiSend: 'Enviar',
+        aiActive: 'Asistente Activo',
+        tabBandas: 'Bandas',
+        tabSuma: 'Sumar Resist.',
+        tabOhm: 'Ley de Ohm',
+        tipoRes: 'Tipo de Resistencia',
+        opt4B: '4 Bandas',
+        opt5B: '5 Bandas (Alta Precisión)',
+        opt6B: '6 Bandas (Con Coeficiente Térmico)',
+        band1: 'Banda 1',
+        band2: 'Banda 2',
+        band3: 'Banda 3 (Cifra)',
+        mult: 'Multiplicador',
+        tol: 'Tolerancia',
+        temp: 'Coef. Térmico',
+        valCalc: 'Valor Calculado',
+        escuchar: '🔊 Escuchar',
+        tipoCon: 'Tipo de Conexión',
+        optSerie: 'En Serie',
+        optParalelo: 'En Paralelo',
+        optMixto: 'Mixto (Serie / Paralelo)',
+        btnAgregar: '+ Agregar',
+        esqGraf: 'Esquema Gráfico del Circuito (Con Valores)',
+        resEq: 'Resistencia Equivalente Total (Rt)',
+        ohmCalcQ: '¿Qué deseas calcular?',
+        diagOhm: 'Diagrama Circuital Ley de Ohm',
+        curTitle: '💡 ¿Sabías que?',
+        nextBtn: 'Siguiente',
+        silentBtn: 'Callar',
+        voiceMsg: 'El valor calculado es '
+    },
+    'en-US': {
+        aiTitle: '⚡ Electronics AI',
+        aiWelcome: 'Hello! Ask me about circuits, Ohm\'s law, or bands.',
+        aiPlaceholder: 'Ask...',
+        aiSend: 'Send',
+        aiActive: 'Active Assistant',
+        tabBandas: 'Bands',
+        tabSuma: 'Add Resistors',
+        tabOhm: "Ohm's Law",
+        tipoRes: 'Resistor Type',
+        opt4B: '4 Bands',
+        opt5B: '5 Bands (High Precision)',
+        opt6B: '6 Bands (With Temp. Coeff.)',
+        band1: 'Band 1',
+        band2: 'Band 2',
+        band3: 'Band 3 (Digit)',
+        mult: 'Multiplier',
+        tol: 'Tolerance',
+        temp: 'Temp. Coeff.',
+        valCalc: 'Calculated Value',
+        escuchar: '🔊 Listen',
+        tipoCon: 'Connection Type',
+        optSerie: 'Series',
+        optParalelo: 'Parallel',
+        optMixto: 'Mixed (Series / Parallel)',
+        btnAgregar: '+ Add',
+        esqGraf: 'Circuit Graphical Scheme (With Values)',
+        resEq: 'Total Equivalent Resistance (Rt)',
+        ohmCalcQ: 'What do you want to calculate?',
+        diagOhm: "Ohm's Law Circuit Diagram",
+        curTitle: '💡 Did you know?',
+        nextBtn: 'Next',
+        silentBtn: 'Mute',
+        voiceMsg: 'The calculated value is '
+    }
+};
+
+const curiosidades = {
+    'es-ES': [
+        "¿Sabías que las resistencias de carbón dependen fuertemente de la temperatura? Por eso existen resistencias de precisión con coeficiente térmico bajo.",
+        "La ley de Ohm fue publicada por primera vez en 1827 por el físico alemán Georg Ohm, relacionando tensión, corriente y resistencia.",
+        "Los colores en las resistencias se estandarizaron internacionalmente en la década de 1920 para facilitar su lectura sin importar el idioma.",
+        "Una resistencia en paralelo siempre reduce la resistencia equivalente total del circuito respecto al componente más pequeño."
+    ],
+    'en-US': [
+        "Did you know carbon resistors strongly depend on temperature? That's why precision resistors with low thermal coefficients exist.",
+        "Ohm's law was first published in 1827 by the German physicist Georg Ohm, relating voltage, current, and resistance.",
+        "Resistor colors were standardized internationally in the 1920s to make reading them easy regardless of language.",
+        "A parallel resistor always reduces the total equivalent resistance of the circuit compared to the smallest component."
+    ]
+};
+
+let indiceCuriosidad = 0;
+let muteCuriosidades = false;
+
+function cambiarIdiomaInterfaz() {
+    const lang = document.getElementById('idiomaVoz').value;
+    const t = traducciones[lang];
+
+    document.getElementById('txtAiTitle').innerText = t.aiTitle;
+    document.getElementById('aiWelcomeMsg').innerText = t.aiWelcome;
+    document.getElementById('aiInputUser').placeholder = t.aiPlaceholder;
+    document.getElementById('btnSendAi').innerText = t.aiSend;
+    document.getElementById('aiActiveLabel').innerText = t.aiActive;
+    
+    document.getElementById('btnTabBandas').innerText = t.tabBandas;
+    document.getElementById('btnTabSuma').innerText = t.tabSuma;
+    document.getElementById('btnTabOhm').innerText = t.tabOhm;
+
+    document.getElementById('lblTipoRes').innerText = t.tipoRes;
+    const selTipo = document.getElementById('tipoBandas');
+    selTipo.options[0].text = t.opt4B;
+    selTipo.options[1].text = t.opt5B;
+    selTipo.options[2].text = t.opt6B;
+
+    document.getElementById('lblBand1').innerText = t.band1;
+    document.getElementById('lblBand2').innerText = t.band2;
+    document.getElementById('lblBand3').innerText = t.band3;
+    document.getElementById('lblMult').innerText = t.mult;
+    document.getElementById('lblTol').innerText = t.tol;
+    document.getElementById('lblTemp').innerText = t.temp;
+    document.getElementById('lblValorCalculado').innerText = t.valCalc;
+    document.getElementById('btnEscuchar').innerText = t.escuchar;
+
+    document.getElementById('lblTipoConexion').innerText = t.tipoCon;
+    const selCon = document.getElementById('tipoConexion');
+    selCon.options[0].text = t.optSerie;
+    selCon.options[1].text = t.optParalelo;
+    selCon.options[2].text = t.optMixto;
+    document.getElementById('btnAgregarResist').innerText = t.btnAgregar;
+    document.getElementById('lblEsquemaGrafico').innerText = t.esqGraf;
+    document.getElementById('lblResEq').innerText = t.resEq;
+
+    document.getElementById('lblOhmCalcular').innerText = t.ohmCalcQ;
+    document.getElementById('lblDiagramaOhm').innerText = t.diagOhm;
+
+    document.getElementById('txtCuriosityTitle').innerText = t.curTitle;
+    document.getElementById('btnNextCuriosity').innerText = t.nextBtn;
+    document.getElementById('btnMuteCuriosity').innerText = t.silentBtn;
+
+    mostrarCuriosidad();
+}
+
+function cambiarPestaña(tipo) {
+    const btnBandas = document.getElementById('btnTabBandas');
+    const btnSuma = document.getElementById('btnTabSuma');
+    const btnOhm = document.getElementById('btnTabOhm');
+    const contentBandas = document.getElementById('contentBandas');
+    const contentSuma = document.getElementById('contentSuma');
+    const contentOhm = document.getElementById('contentOhm');
+    
+    btnBandas.classList.remove('active');
+    btnSuma.classList.remove('active');
+    btnOhm.classList.remove('active');
+    contentBandas.classList.remove('active');
+    contentSuma.classList.remove('active');
+    contentOhm.classList.remove('active');
+
+    if (tipo === 'bandas') {
+        btnBandas.classList.add('active');
+        contentBandas.classList.add('active');
+    } else if (tipo === 'suma') {
+        btnSuma.classList.add('active');
+        contentSuma.classList.add('active');
+    } else if (tipo === 'ohm') {
+        btnOhm.classList.add('active');
+        contentOhm.classList.add('active');
+        calcularLeyOhm();
+    }
+}
+
+function actualizarModoConexionSumador() {
+    const tipo = document.getElementById('tipoConexion').value;
+    const containerSimple = document.getElementById('dynamicResistorsContainer');
+    const containerMixto = document.getElementById('mixtoAdvancedContainer');
+    const btnAgregar = document.getElementById('btnAgregarContenedor');
+    if (tipo === 'mixto') {
+        containerSimple.style.display = 'none';
+        containerMixto.style.display = 'block';
+        btnAgregar.style.display = 'none';
+        if (containerMixto.children.length === 0) {
+            agregarBloqueMixtoEjemplo();
+        } else {
+            calcularSerieParalelo();
+        }
+    } else {
+        containerSimple.style.display = 'flex';
+        containerMixto.style.display = 'none';
+        btnAgregar.style.display = 'flex';
+        if (containerSimple.children.length === 0) {
+            agregarResistenciaIndividual(3, '1');
+            agregarResistenciaIndividual(3, '1');
+            agregarResistenciaIndividual(1, '1');
+        } else {
+            calcularSerieParalelo();
+        }
+    }
+}
+
+function agregarResistenciaIndividual(val = '', mult = '1') {
+    const container = document.getElementById('dynamicResistorsContainer');
+    const index = container.children.length + 1;
+    const div = document.createElement('div');
+    div.className = 'resistor-row-item';
+    div.innerHTML = `
+        <span class="r-label">R${index}</span>
+        <input type="number" class="r-val" value="${val}" placeholder="Valor" oninput="calcularSerieParalelo()">
+        <select class="r-unit" onchange="calcularSerieParalelo()" style="background:#fff;">
+            <option value="1" ${mult === '1' ? 'selected' : ''}>Ω</option>
+            <option value="1000" ${mult === '1000' ? 'selected' : ''}>kΩ</option>
+            <option value="1000000" ${mult === '1000000' ? 'selected' : ''}>MΩ</option>
+        </select>
+        <button class="btn-danger" onclick="this.parentElement.remove(); reindexarResistencias(); calcularSerieParalelo();">×</button>
+    `;
+    container.appendChild(div);
+    calcularSerieParalelo();
+}
+
+function reindexarResistencias() {
+    const items = document.querySelectorAll('#dynamicResistorsContainer .resistor-row-item');
+    items.forEach((item, idx) => {
+        item.querySelector('.r-label').innerText = `R${idx + 1}`;
+    });
+}
+
+function agregarBloqueMixtoEjemplo() {
+    const container = document.getElementById('mixtoAdvancedContainer');
+    container.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items:center;">
+            <label style="margin:0; color:var(--accent-cyan);">Estructura Mixta</label>
+            <button class="btn-vibrant btn-green" style="font-size:0.7rem; padding:3px 8px;" onclick="agregarFilaMixta()">+ Agregar</button>
+        </div>
+        <div id="filasMixtasContainer" style="display: flex; flex-direction:column; gap: 6px;">
+            <div class="resistor-row-item mixto-row" style="grid-template-columns: 60px 90px 1fr 85px 30px;">
+                <span class="r-label">R1</span>
+                <select class="mixto-tipo" onchange="calcularSerieParalelo()" style="background:#fff;">
+                    <option value="serie" selected>Serie</option>
+                    <option value="paralelo">Paralelo</option>
+                </select>
+                <input type="number" class="r-val" value="10" oninput="calcularSerieParalelo()">
+                <select class="r-unit" onchange="calcularSerieParalelo()" style="background:#fff;">
+                    <option value="1" selected>Ω</option>
+                    <option value="1000">kΩ</option>
+                </select>
+                <button class="btn-danger" onclick="this.parentElement.remove(); calcularSerieParalelo();">X</button>
+            </div>
+            <div class="resistor-row-item mixto-row" style="grid-template-columns: 60px 90px 1fr 85px 30px;">
+                <span class="r-label">R2</span>
+                <select class="mixto-tipo" onchange="calcularSerieParalelo()" style="background:#fff;">
+                    <option value="serie">Serie</option>
+                    <option value="paralelo" selected>Paralelo</option>
+                </select>
+                <input type="number" class="r-val" value="20" oninput="calcularSerieParalelo()">
+                <select class="r-unit" onchange="calcularSerieParalelo()" style="background:#fff;">
+                    <option value="1" selected>Ω</option>
+                    <option value="1000">kΩ</option>
+                </select>
+                <button class="btn-danger" onclick="this.parentElement.remove(); calcularSerieParalelo();">X</button>
+            </div>
+        </div>
+    `;
+    calcularSerieParalelo();
+}
+
+function agregarFilaMixta() {
+    const container = document.getElementById('filasMixtasContainer');
+    const count = container.children.length + 1;
+    const div = document.createElement('div');
+    div.className = 'resistor-row-item mixto-row';
+    div.style.gridTemplateColumns = "60px 90px 1fr 85px 30px";
+    div.innerHTML = `
+        <span class="r-label">R${count}</span>
+        <select class="mixto-tipo" onchange="calcularSerieParalelo()" style="background:#fff;">
+            <option value="serie">Serie</option>
+            <option value="paralelo" selected>Paralelo</option>
+        </select>
+        <input type="number" class="r-val" value="100" oninput="calcularSerieParalelo()">
+        <select class="r-unit" onchange="calcularSerieParalelo()" style="background:#fff;">
+            <option value="1" selected>Ω</option>
+            <option value="1000">kΩ</option>
+        </select>
+        <button class="btn-danger" onclick="this.parentElement.remove(); calcularSerieParalelo();">X</button>
+    `;
+    container.appendChild(div);
+    calcularSerieParalelo();
+}
+
+function calcularSerieParalelo() {
+    const tipo = document.getElementById('tipoConexion').value;
+    const resEl = document.getElementById('resultadoGrupo');
+    const svgEsquema = document.getElementById('svgEsquema');
+    let equivalente = 0;
+    
+    if (tipo === 'mixto') {
+        const filas = document.querySelectorAll('.mixto-row');
+        if (filas.length === 0) {
+            resEl.innerText = "0 Ω";
+            svgEsquema.innerHTML = `<text x="190" y="55" fill="#64748b" font-size="11" text-anchor="middle">Agrega resistencias</text>`;
+            return;
+        }
+        let sumaSerie = 0;
+        let terminosParalelo = [];
+        let datosMixtos = [];
+        filas.forEach((fila, idx) => {
+            const tBloque = fila.querySelector('.mixto-tipo').value;
+            const valInput = parseFloat(fila.querySelector('.r-val').value) || 0;
+            const unitSelect = fila.querySelector('.r-unit');
+            const mult = parseFloat(unitSelect.value) || 1;
+            const unidadTexto = unitSelect.options[unitSelect.selectedIndex].text;
+            const realVal = valInput * mult;
+            datosMixtos.push({
+                name: `R${idx + 1}`,
+                textVal: valInput ? `${valInput} ${unidadTexto}` : '0 Ω',
+                tipo: tBloque
+            });
+            if (tBloque === 'serie') {
+                sumaSerie += realVal;
+            } else {
+                if (realVal > 0) terminosParalelo.push(realVal);
+            }
+        });
+        let eqParalelo = 0;
+        if (terminosParalelo.length > 0) {
+            let sumaInversas = terminosParalelo.reduce((acc, v) => acc + (1 / v), 0);
+            eqParalelo = sumaInversas > 0 ? (1 / sumaInversas) : 0;
+        }
+        equivalente = sumaSerie + eqParalelo;
+        resEl.innerText = formatearResistencia(equivalente);
+        dibujarEsquemaMixtoDinamico(datosMixtos);
+    } else {
+        const rows = document.querySelectorAll('#dynamicResistorsContainer .resistor-row-item');
+        if (rows.length === 0) {
+            resEl.innerText = "0 Ω";
+            svgEsquema.innerHTML = `<text x="190" y="55" fill="#64748b" font-size="11" text-anchor="middle">Agrega resistencias</text>`;
+            return;
+        }
+        let datosSimples = [];
+        let valores = [];
+        rows.forEach((row, idx) => {
+            const v = parseFloat(row.querySelector('.r-val').value) || 0;
+            const unitSelect = row.querySelector('.r-unit');
+            const m = parseFloat(unitSelect.value) || 1;
+            const unidadTexto = unitSelect.options[unitSelect.selectedIndex].text;
+            if (v > 0) valores.push(v * m);
+            datosSimples.push({
+                name: `R${idx + 1}`,
+                textVal: v ? `${v} ${unidadTexto}` : '0 Ω'
+            });
+        });
+        if (valores.length === 0) {
+            resEl.innerText = "0 Ω";
+            svgEsquema.innerHTML = `<text x="190" y="55" fill="#64748b" font-size="11" text-anchor="middle">Ingresa valores</text>`;
+            return;
+        }
+        if (tipo === 'serie') {
+            equivalente = valores.reduce((a, b) => a + b, 0);
+        } else {
+            let sumaInversas = valores.reduce((acc, v) => acc + (1 / v), 0);
+            equivalente = sumaInversas > 0 ? (1 / sumaInversas) : 0;
+        }
+        resEl.innerText = formatearResistencia(equivalente);
+        dibujarEsquemaLineal(tipo, datosSimples);
+    }
+}
+
+function formatearResistencia(val) {
+    if (val >= 1000000) return (val / 1000000).toFixed(2) + " MΩ";
+    if (val >= 1000) return (val / 1000).toFixed(2) + " kΩ";
+    return val.toFixed(2) + " Ω";
+}
+
+function actualizarCamposOhm() {
+    const modo = document.getElementById('ohmCalcular').value;
+    const lbl1 = document.getElementById('ohmLabel1');
+    const lbl2 = document.getElementById('ohmLabel2');
+    const selUnit2 = document.getElementById('ohmUnit2');
+    
+    if (modo === 'V') {
+        lbl1.innerText = "Corriente (I)";
+        lbl2.innerText = "Resistencia (R)";
+        selUnit2.innerHTML = '<option value="1" selected>Ω</option><option value="1000">kΩ</option>';
+    } else if (modo === 'I') {
+        lbl1.innerText = "Voltaje (V)";
+        lbl2.innerText = "Resistencia (R)";
+        selUnit2.innerHTML = '<option value="1" selected>Ω</option><option value="1000">kΩ</option>';
+    } else if (modo === 'R') {
+        lbl1.innerText = "Voltaje (V)";
+        lbl2.innerText = "Corriente (I)";
+        selUnit2.innerHTML = '<option value="1" selected>A</option><option value="0.001">mA</option>';
+    }
+}
+
+function calcularLeyOhm() {
+    const modo = document.getElementById('ohmCalcular').value;
+    const val1 = parseFloat(document.getElementById('ohmVal1').value) || 0;
+    const unit1 = parseFloat(document.getElementById('ohmUnit1').value) || 1;
+    const val2 = parseFloat(document.getElementById('ohmVal2').value) || 0;
+    const unit2 = parseFloat(document.getElementById('ohmUnit2').value) || 1;
+    
+    const v1Real = val1 * unit1;
+    const v2Real = val2 * unit2;
+    
+    const resValEl = document.getElementById('ohmResultadoValor');
+    const resLblEl = document.getElementById('ohmResultadoLabel');
+    const svgOhm = document.getElementById('svgOhmEsquema');
+    
+    let resultadoFinal = 0;
+    let textoResultado = "";
+    let textoEtiqueta = "";
+    
+    if (modo === 'V') {
+        resultadoFinal = v1Real * v2Real;
+        textoResultado = resultadoFinal >= 1000 ? (resultadoFinal / 1000).toFixed(2) + " kV" : resultadoFinal.toFixed(2) + " V";
+        textoEtiqueta = "Voltaje Calculado (V)";
+    } else if (modo === 'I') {
+        resultadoFinal = v2Real > 0 ? v1Real / v2Real : 0;
+        textoResultado = resultadoFinal < 0.01 && resultadoFinal > 0 ? (resultadoFinal * 1000).toFixed(2) + " mA" : resultadoFinal.toFixed(2) + " A";
+        textoEtiqueta = "Corriente Calculada (I)";
+    } else if (modo === 'R') {
+        resultadoFinal = v2Real > 0 ? v1Real / v2Real : 0;
+        textoResultado = formatearResistencia(resultadoFinal);
+        textoEtiqueta = "Resistencia Calculada (R)";
+    }
+    
+    resLblEl.innerText = textoEtiqueta;
+    resValEl.innerText = textoResultado;
+    
+    svgOhm.innerHTML = `
+        <line x1="50" y1="55" x2="130" y2="55" stroke="#0284c7" stroke-width="2.5"/>
+        <circle cx="90" cy="55" r="18" fill="#ffffff" stroke="#0284c7" stroke-width="2.5"/>
+        <text x="90" y="52" fill="#0369a1" font-size="11" font-weight="bold" text-anchor="middle">${modo === 'V' ? 'V' : (val1 + (unit1 === 0.001 ? 'mA' : 'A'))}</text>
+        <line x1="130" y1="55" x2="160" y2="55" stroke="#0284c7" stroke-width="2.5"/>
+        <rect x="160" y="38" width="60" height="34" rx="4" fill="#ffffff" stroke="#db2777" stroke-width="2.5"/>
+        <text x="190" y="52" fill="#0f172a" font-size="9" font-weight="bold" text-anchor="middle">Carga</text>
+        <line x1="220" y1="55" x2="330" y2="55" stroke="#0284c7" stroke-width="2.5"/>
+        <path d="M 330,55 L 330,85 L 50,85 L 50,55" fill="none" stroke="#0284c7" stroke-width="2.5"/>
+    `;
+}
+
+function dibujarEsquemaLineal(tipo, datos) {
+    const svg = document.getElementById('svgEsquema');
+    let content = '';
+    let totalItems = datos.length;
+
+    if (tipo === 'paralelo' && totalItems > 0) {
+        let anchoSVG = 380;
+        let altoSVG = 110;
+        let xInicio = 50;
+        let xFin = 330;
+        let centroX = (xInicio + xFin) / 2;
+        let espacioY = altoSVG / (totalItems + 1);
+
+        content += `<line x1="15" y1="${altoSVG / 2}" x2="${xInicio}" y2="${altoSVG / 2}" stroke="#0284c7" stroke-width="2.5"/>`;
+        content += `<line x1="${xFin}" y1="${altoSVG / 2}" x2="${anchoSVG - 15}" y2="${altoSVG / 2}" stroke="#0284c7" stroke-width="2.5"/>`;
+
+        datos.forEach((item, i) => {
+            let yPos = (i + 1) * espacioY;
+            content += `<line x1="${xInicio}" y1="${altoSVG / 2}" x2="${xInicio}" y2="${yPos}" stroke="#0284c7" stroke-width="2"/>`;
+            content += `<line x1="${xInicio}" y1="${yPos}" x2="${centroX - 27.5}" y2="${yPos}" stroke="#0284c7" stroke-width="2"/>`;
+            content += `<rect x="${centroX - 27.5}" y="${yPos - 13}" width="55" height="26" rx="4" fill="#ffffff" stroke="#db2777" stroke-width="2"/>`;
+            content += `<text x="${centroX}" y="${yPos - 3}" fill="#0f172a" font-size="9" font-weight="bold" text-anchor="middle">${item.name}</text>`;
+            content += `<text x="${centroX}" y="${yPos + 8}" fill="#db2777" font-size="8" font-weight="bold" text-anchor="middle">${item.textVal}</text>`;
+            content += `<line x1="${centroX + 27.5}" y1="${yPos}" x2="${xFin}" y2="${yPos}" stroke="#0284c7" stroke-width="2"/>`;
+            content += `<line x1="${xFin}" y1="${yPos}" x2="${xFin}" y2="${altoSVG / 2}" stroke="#0284c7" stroke-width="2"/>`;
+        });
+    } else {
+        let startX = 30;
+        let spacing = Math.min(70, 280 / (totalItems || 1));
+        content += `<line x1="18" y1="55" x2="${startX}" y2="55" stroke="#0284c7" stroke-width="2.5"/>`;
+
+        datos.forEach((item, i) => {
+            let rx = startX + (i * spacing);
+            content += `
+                <rect x="${rx}" y="38" width="55" height="34" rx="4" fill="#ffffff" stroke="#0284c7" stroke-width="2"/>
+                <text x="${rx + 27.5}" y="52" fill="#0f172a" font-size="9" font-weight="bold" text-anchor="middle">${item.name}</text>
+                <text x="${rx + 27.5}" y="64" fill="#0369a1" font-size="8" font-weight="bold" text-anchor="middle">${item.textVal}</text>
+            `;
+            if (i < totalItems - 1) {
+                content += `<line x1="${rx + 55}" y1="55" x2="${rx + spacing}" y2="55" stroke="#0284c7" stroke-width="2.5"/>`;
+            } else {
+                content += `<line x1="${rx + 55}" y1="55" x2="${rx + spacing + 30}" y2="55" stroke="#0284c7" stroke-width="2.5"/>`;
+            }
+        });
+    }
+    svg.innerHTML = content;
+}
+
+function dibujarEsquemaMixtoDinamico(datos) {
+    const svg = document.getElementById('svgEsquema');
+    let seriesItems = datos.filter(d => d.tipo === 'serie');
+    let parItems = datos.filter(d => d.tipo === 'paralelo');
+    let content = `<line x1="15" y1="55" x2="45" y2="55" stroke="#0284c7" stroke-width="2.5"/>`;
+    
+    let currentX = 45;
+    seriesItems.forEach(item => {
+        content += `
+            <rect x="${currentX}" y="38" width="55" height="34" rx="4" fill="#ffffff" stroke="#0284c7" stroke-width="2"/>
+            <text x="${currentX + 27.5}" y="52" fill="#0f172a" font-size="9" font-weight="bold" text-anchor="middle">${item.name}</text>
+            <text x="${currentX + 27.5}" y="64" fill="#0369a1" font-size="8" font-weight="bold" text-anchor="middle">${item.textVal}</text>
+        `;
+        currentX += 55;
+        content += `<line x1="${currentX}" y1="55" x2="${currentX + 25}" y2="55" stroke="#0284c7" stroke-width="2.5"/>`;
+        currentX += 25;
+    });
+
+    if (parItems.length > 0) {
+        let nodoX = currentX;
+        content += `<circle cx="${nodoX}" cy="55" r="3.5" fill="#0284c7"/>`;
+        let branchX = nodoX + 20;
+        let branchEnd = branchX + 55;
+        parItems.forEach((item, idx) => {
+            let yPos = (idx === 0) ? 20 : 90;
+            if (parItems.length > 2) {
+                yPos = 15 + (idx * (80 / (parItems.length - 1)));
+            }
+            content += `
+                <line x1="${nodoX}" y1="55" x2="${nodoX}" y2="${yPos}" stroke="#0284c7" stroke-width="2"/>
+                <line x1="${nodoX}" y1="${yPos}" x2="${branchX}" y2="${yPos}" stroke="#0284c7" stroke-width="2"/>
+                <rect x="${branchX}" y="${yPos - 13}" width="55" height="26" rx="3" fill="#ffffff" stroke="#db2777" stroke-width="2"/>
+                <text x="${branchX + 27.5}" y="${yPos - 3}" fill="#0f172a" font-size="9" font-weight="bold" text-anchor="middle">${item.name}</text>
+                <text x="${branchX + 27.5}" y="${yPos + 8}" fill="#db2777" font-size="8" font-weight="bold" text-anchor="middle">${item.textVal}</text>
+                <line x1="${branchEnd}" y1="${yPos}" x2="${branchEnd + 20}" y2="${yPos}" stroke="#0284c7" stroke-width="2"/>
+                <line x1="${branchEnd + 20}" y1="${yPos}" x2="${branchEnd + 20}" y2="55" stroke="#0284c7" stroke-width="2"/>
+            `;
+        });
+        let salidaX = branchEnd + 20;
+        content += `<line x1="${salidaX}" y1="55" x2="${salidaX + 30}" y2="55" stroke="#0284c7" stroke-width="2.5"/>`;
+    }
+    svg.innerHTML = content;
+}
+
+function actualizarInterfazBandas() {
+    const tipo = document.getElementById('tipoBandas').value;
+    const grupoBanda3 = document.getElementById('grupoBanda3');
+    const grupoBanda6 = document.getElementById('grupoBanda6');
+    const svgB3 = document.getElementById('svgB3');
+    const svgTemp = document.getElementById('svgTemp');
+    if (tipo === '4') {
+        grupoBanda3.style.display = 'none';
+        grupoBanda6.style.display = 'none';
+        svgB3.style.display = 'none';
+        svgTemp.style.display = 'none';
+    } else if (tipo === '5') {
+        grupoBanda3.style.display = 'block';
+        grupoBanda6.style.display = 'none';
+        svgB3.style.display = 'block';
+        svgTemp.style.display = 'none';
+    } else if (tipo === '6') {
+        grupoBanda3.style.display = 'block';
+        grupoBanda6.style.display = 'block';
+        svgB3.style.display = 'block';
+        svgTemp.style.display = 'block';
+    }
+}
+
+function calcularResistencia() {
+    const tipo = document.getElementById('tipoBandas').value;
+    const b1 = parseInt(document.getElementById('band1').value);
+    const b2 = parseInt(document.getElementById('band2').value);
+    const b3 = parseInt(document.getElementById('band3').value);
+    const mult = parseFloat(document.getElementById('multiplier').value);
+    const tol = document.getElementById('tolerance').value;
+    const temp = document.getElementById('tempCoeff').value;
+    let cifraBase = (tipo === '4') ? (b1 * 10 + b2) * mult : (b1 * 100 + b2 * 10 + b3) * mult;
+    let textoValor = cifraBase >= 1000000 ? (cifraBase / 1000000).toFixed(2) + ' MΩ' : (cifraBase >= 1000 ? (cifraBase / 1000).toFixed(2) + ' kΩ' : cifraBase.toFixed(0) + ' Ω');
+    let resultadoFinal = `${textoValor} ${tol}`;
+    if (tipo === '6') resultadoFinal += ` (${temp})`;
+    document.getElementById('resultado').innerText = resultadoFinal;
+    actualizarColoresSVG();
+}
+
+function actualizarColoresSVG() {
+    const b1Select = document.getElementById('band1');
+    const b2Select = document.getElementById('band2');
+    const b3Select = document.getElementById('band3');
+    const multSelect = document.getElementById('multiplier');
+    const tolSelect = document.getElementById('tolerance');
+    const tempSelect = document.getElementById('tempCoeff');
+    document.getElementById('svgB1').style.fill = b1Select.options[b1Select.selectedIndex].getAttribute('data-color');
+    document.getElementById('svgB2').style.fill = b2Select.options[b2Select.selectedIndex].getAttribute('data-color');
+    document.getElementById('svgB3').style.fill = b3Select.options[b3Select.selectedIndex].getAttribute('data-color');
+    document.getElementById('svgMult').style.fill = multSelect.options[multSelect.selectedIndex].getAttribute('data-color');
+    document.getElementById('svgTol').style.fill = tolSelect.options[tolSelect.selectedIndex].getAttribute('data-color');
+    document.getElementById('svgTemp').style.fill = tempSelect.options[tempSelect.selectedIndex].getAttribute('data-color');
+}
+
+function mostrarCuriosidad() {
+    const lang = document.getElementById('idiomaVoz').value;
+    const lista = curiosidades[lang];
+    document.getElementById('curiosityText').innerText = lista[indiceCuriosidad];
+    if (!muteCuriosidades) hablarTexto(lista[indiceCuriosidad], lang);
+}
+
+function siguienteCuriosidad() {
+    const lang = document.getElementById('idiomaVoz').value;
+    const lista = curiosidades[lang];
+    indiceCuriosidad = (indiceCuriosidad + 1) % lista.length;
+    mostrarCuriosidad();
+}
+
+function toggleMuteCuriosidades() {
+    muteCuriosidades = !muteCuriosidades;
+    const btn = document.getElementById('btnMuteGeneral');
+    const lang = document.getElementById('idiomaVoz').value;
+    btn.innerText = muteCuriosidades ? (lang === 'en-US' ? "Sound OFF" : "Sonido OFF") : (lang === 'en-US' ? "Sound ON" : "Sonido ON");
+    if (muteCuriosidades) window.speechSynthesis.cancel();
+}
+
+function pararVozCuriosidad() { window.speechSynthesis.cancel(); }
+
+function hablarTexto(texto, lang = 'es-ES') {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(texto);
+    utterance.lang = lang;
+    window.speechSynthesis.speak(utterance);
+}
+
+function hablarResultado() {
+    const texto = document.getElementById('resultado').innerText;
+    const idioma = document.getElementById('idiomaVoz').value;
+    const t = traducciones[idioma];
+    hablarTexto(t.voiceMsg + texto, idioma);
+}
+
+function consultarIA() {
+    const input = document.getElementById('aiInputUser');
+    const txt = input.value.trim();
+    if (!txt) return;
+    const chat = document.getElementById('aiChatMessages');
+    chat.innerHTML += `<div class="ai-msg user">${txt}</div>`;
+    input.value = '';
+    setTimeout(() => {
+        const lang = document.getElementById('idiomaVoz').value;
+        let respuesta = lang === 'en-US' 
+            ? "Ohm's law states that voltage equals current times resistance (V = I × R)." 
+            : "La Ley de Ohm establece que el voltaje es igual a la corriente por la resistencia (V = I × R).";
+        chat.innerHTML += `<div class="ai-msg bot">${respuesta}</div>`;
+        chat.scrollTop = chat.scrollHeight;
+    }, 500);
+}
+
+window.onload = function() {
+    actualizarInterfazBandas();
+    calcularResistencia();
+    actualizarModoConexionSumador();
+    cambiarIdiomaInterfaz();
+};
+</script>
+</body>
+</html>
